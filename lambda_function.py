@@ -1,7 +1,19 @@
 import urllib.request
 import time
+import boto3
+import os
 from datetime import datetime,timezone
 from urllib.error import URLError, HTTPError
+from decimal import Decimal
+
+dynamodb = boto3.resource("dynamodb")
+tablename = os.environ["TABLE_NAME"]
+table = dynamodb.Table(tablename)
+
+def save_result(result):
+    item = result.copy()
+    item["time_elapsed_ms"] = Decimal(str(item["time_elapsed_ms"]))
+    table.put_item(Item = item)
 
 def lambda_handler(event, context):
     try:
@@ -19,7 +31,8 @@ def lambda_handler(event, context):
             "time_elapsed_ms" : time_elapsed,
             "healthy" : 200 <= response.status < 400
         }
-        print(result)
+        print({"request_id": context.aws_request_id, "result": result})
+        save_result(result)
         return result
     except HTTPError as error_response:
         time_elapsed = round((time.perf_counter() - start_time) * 1000, 2)
@@ -33,7 +46,8 @@ def lambda_handler(event, context):
             "failure_type": "HTTP_ERROR",
             "error": str(error_response)
         }
-        print(result)
+        print({"request_id": context.aws_request_id, "result": result})
+        save_result(result)
         return result
     except URLError as error_response:
         time_elapsed = round((time.perf_counter() - start_time) * 1000,2)
@@ -46,7 +60,8 @@ def lambda_handler(event, context):
             "failure_type": "URL_ERROR",
             "error": str(error_response)
         }
-        print(result)
+        print({"request_id": context.aws_request_id, "result": result})
+        save_result(result)
         return result
     except TimeoutError as error_response:
         time_elapsed = round((time.perf_counter() - start_time) * 1000,2)
@@ -59,7 +74,8 @@ def lambda_handler(event, context):
             "failure_type": "TIMEOUT",
             "error": str(error_response)
         }
-        print(result)
+        print({"request_id": context.aws_request_id, "result": result})
+        save_result(result)
         return result
 
     
