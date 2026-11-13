@@ -2,6 +2,7 @@ import urllib.request
 import time
 import boto3
 import os
+import json
 from datetime import datetime,timezone
 from urllib.error import URLError, HTTPError
 from decimal import Decimal
@@ -10,10 +11,25 @@ dynamodb = boto3.resource("dynamodb")
 tablename = os.environ["TABLE_NAME"]
 table = dynamodb.Table(tablename)
 
+sns = boto3.client("sns")
+sns_topic_arn = os.environ["SNS_TOPIC_ARN"]
+
 def save_result(result):
     item = result.copy()
     item["time_elapsed_ms"] = Decimal(str(item["time_elapsed_ms"]))
     table.put_item(Item = item)
+
+def send_alert(result):
+    if result["healthy"]:
+        return
+    else:
+        response = sns.publish(
+            TopicArn=sns_topic_arn, 
+            Subject=f"Health Alert: {result['service_id']}", 
+            Message=json.dumps(result, indent=2)
+            )
+        
+        print({"alert_sent": True, "sns_message_id": response["MessageId"], "service_id": result["service_id"]})
 
 def lambda_handler(event, context):
     try:
@@ -48,6 +64,7 @@ def lambda_handler(event, context):
         }
         print({"request_id": context.aws_request_id, "result": result})
         save_result(result)
+        send_alert(result)
         return result
     except URLError as error_response:
         time_elapsed = round((time.perf_counter() - start_time) * 1000,2)
@@ -62,6 +79,7 @@ def lambda_handler(event, context):
         }
         print({"request_id": context.aws_request_id, "result": result})
         save_result(result)
+        send_alert(result)
         return result
     except TimeoutError as error_response:
         time_elapsed = round((time.perf_counter() - start_time) * 1000,2)
@@ -76,6 +94,7 @@ def lambda_handler(event, context):
         }
         print({"request_id": context.aws_request_id, "result": result})
         save_result(result)
+        send_alert(result)
         return result
 
     

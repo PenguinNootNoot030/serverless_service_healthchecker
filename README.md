@@ -12,11 +12,11 @@ This is a serverless health monitoring system built with AWS.
   - Response time
   - Health status
 - [x] Each health-check result is stored in Amazon DynamoDB.
-- [ ] If a service is unhealthy, an alert is sent through Amazon SNS.
+- [x] If a service is unhealthy, an alert is sent through Amazon SNS.
 
 ### IAM Configuration
 
-The Lambda execution role requires permission to write health-check results to Amazon DynamoDB.
+The Lambda execution role requires permission to write health-check results to Amazon DynamoDB, and SNS publishing notification.
 
 A sample least-privilege IAM policy is provided in `iam/dynamodb-write-policy.json`, assuming the region is eu-west-2.
 

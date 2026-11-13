@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowHealthCheckWrites",
+      "Effect": "Allow",
+      "Action": "dynamodb:PutItem",
+      "Resource": "arn:aws:dynamodb:eu-west-2:YOUR_ACCOUNT_ID:table/ServiceHealthChecks"
+    },
+    {
+      "Sid": "AllowHealthAlertPublishing",
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "arn:aws:sns:eu-west-2:YOUR_ACCOUNT_ID:service-health-alert"
+    }
+  ]
+}
