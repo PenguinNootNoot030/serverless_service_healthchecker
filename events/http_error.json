@@ -1,0 +1,4 @@
+{
+  "service_id": "test-404",
+  "url": "https://httpbin.org/status/404"
+}

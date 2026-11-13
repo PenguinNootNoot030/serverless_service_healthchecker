@@ -1,0 +1,4 @@
+{
+  "service_id": "test-url-error",
+  "url": "https://nonexistent-health-check.invalid"
+}

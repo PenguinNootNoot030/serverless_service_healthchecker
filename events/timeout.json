@@ -1,0 +1,4 @@
+{
+  "service_id": "test-timeout",
+  "url": "https://httpbin.org/delay/10"
+}
