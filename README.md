@@ -18,8 +18,8 @@ This is a serverless health monitoring system built with AWS.
 
 The Lambda execution role requires permission to write health-check results to Amazon DynamoDB, and SNS publishing notification.
 
-A sample least-privilege IAM policy is provided in `iam/dynamodb-write-policy.json`, assuming the region is eu-west-2.
+A sample least-privilege IAM policy is provided in `iam/health-monitor-policy.json`, assuming the region is eu-west-2.
 
 Before applying the policy, replace `YOUR_ACCOUNT_ID` with the target AWS account ID and verify that the Region and table name match the deployed DynamoDB table.
 
-The policy grants only `dynamodb:PutItem` access to the specified table.
+The policy grants `dynamodb:PutItem` access to the specified table, and `sns:Publish` to specific SNS topic.
